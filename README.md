@@ -1,4 +1,5 @@
-# 통화 차단 상황 시뮬레이터
+# 프로젝트 이름
+통화 차단 상황 시뮬레이터
 
 ## 프로젝트 소개
 
@@ -24,17 +25,17 @@
 - [ ] 사용자 인식 차이에 대한 테스트
 - [ ] README 정리하기
 
-## 참고 자료
+## 참고 자료 예정
 
 - 실제 전화 통화 및 음성사서함 동작 방식 조사 자료
 - 통화 UX(User Experience) 관련 자료
 - Android/iOS 통화 화면 및 사용자 인터페이스 참고
 - ([Android Developers](https://developer.android.com/))
-- (.[Apple Developer](https://developer.apple.com/)
+- ([Apple Developer](https://developer.apple.com/)
 
 ## 실행 방법
 
-​```text
+​```
 프로젝트가 진행되면서 개발 환경 및 실행 방법을 추가할 예정입니다.
 프로젝트 진행 목표
 본 프로젝트는 약 3개월 동안 단계적으로 진행할 예정입니다.
