@@ -32,16 +32,15 @@
 ## 구현할 기능
 
 - [x] 통화 시뮬레이션 기본 화면 구현
-- [ ] 통화 시작 및 종료 기능 구현
-- [ ] 통화음 반복 재생 기능
-- [ ] 통화음 재생 횟수 및 시간 설정
+- [x] 통화 시작 및 종료 기능 구현
+- [x] 통화음 반복 재생 기능
+- [x] 통화음 재생 횟수 설정
 - [ ] 일반적인 미응답 상황 시뮬레이션
 - [ ] 차단 상황 시뮬레이션
-- [ ] 음성사서함 연결 상황 시뮬레이션
-- [ ] 통화 상태별 화면 구성
+- [x] 음성사서함 연결 상황 시뮬레이션
+- [x] 통화 상태별 화면 구성
 - [ ] 실행 화면 추가하기
-- [ ] 사용자 인식 차이에 대한 테스트
-- [ ] README 정리하기
+
 
 ---
 
@@ -55,33 +54,126 @@
 ### 실행 화면
 
 > 여기에 현재 프로그램 실행 화면 사진을 추가할 예정입니다.
-
+- 2주차
 <img width="150" height="199" alt="image" src="https://github.com/user-attachments/assets/151a1acf-9994-4eee-a804-bf3536e0808d" />
 
+- 3주차
 
 ---
 
 
 ## 현재 구현된 화면
 
-현재 Python의 Tkinter를 이용하여 통화 상황 시뮬레이터의 기본 화면을 구현했습니다.
+현재 Python의 Tkinter를 이용하여 통화 상황 시뮬레이터의 기본 화면과 통화 기능을 구현했습니다.
 
 현재 화면에는 다음과 같은 기능이 포함되어 있습니다.
 
 - 통화 상황 시뮬레이터 제목 표시
 - 상대방 전화번호 표시
 - 현재 통화 상태 표시
-- 통화 시작 버튼 표시
+- 통화 시작 및 종료 버튼
+- 통화음 횟수 설정
+- 현재 통화음 횟수 표시
+- 설정한 횟수 이후 음성사서함 연결 상태 표시
 
-## 2주차 구현코드
+## 2~3주차 구현코드
 ```
 
 import tkinter as tk
+import winsound
+
+# 통화 중인지 확인
+is_calling = False
+
+# 현재 통화음 횟수
+ring_count = 0
+
+# 예약된 작업 저장
+after_id = None
+
+
+# 통화음 반복 함수
+def play_ring():
+    global ring_count
+    global after_id
+
+    if is_calling:
+        ring_count += 1
+
+        status.config(text=f"통화음 {ring_count}회")
+
+        winsound.PlaySound(
+            "ring.wav",
+            winsound.SND_FILENAME | winsound.SND_ASYNC
+        )
+
+        # 사용자가 설정한 최대 통화음 횟수
+        max_ring = int(ring_setting.get())
+
+        if ring_count >= max_ring:
+            after_id = window.after(6000, connect_voicemail)
+        else:
+            after_id = window.after(6000, play_ring)
+
+
+# 음성사서함 연결 함수
+def connect_voicemail():
+    global is_calling
+    global after_id
+
+    if not is_calling:
+        return
+
+    is_calling = False
+    after_id = None
+
+    winsound.PlaySound(None, winsound.SND_PURGE)
+
+    status.config(text="음성사서함 연결")
+    call_button.config(text="통화 시작", command=start_call)
+
+    ring_setting.config(state="normal")
+
+
+# 통화 시작 함수
+def start_call():
+    global is_calling
+    global ring_count
+
+    is_calling = True
+    ring_count = 0
+
+    status.config(text="통화 연결 중")
+    call_button.config(text="통화 종료", command=end_call)
+
+    ring_setting.config(state="disabled")
+
+    play_ring()
+
+
+# 통화 종료 함수
+def end_call():
+    global is_calling
+    global after_id
+
+    is_calling = False
+
+    if after_id is not None:
+        window.after_cancel(after_id)
+        after_id = None
+
+    winsound.PlaySound(None, winsound.SND_PURGE)
+
+    status.config(text="통화 종료")
+    call_button.config(text="통화 시작", command=start_call)
+
+    ring_setting.config(state="normal")
+
 
 # 프로그램 창 만들기
 window = tk.Tk()
 window.title("통화 상황 시뮬레이터")
-window.geometry("400x500")
+window.geometry("400x550")
 
 # 제목
 title = tk.Label(
@@ -89,7 +181,7 @@ title = tk.Label(
     text="통화 상황 시뮬레이터",
     font=("맑은 고딕", 20, "bold")
 )
-title.pack(pady=40)
+title.pack(pady=30)
 
 # 상대방 번호
 number = tk.Label(
@@ -98,6 +190,27 @@ number = tk.Label(
     font=("맑은 고딕", 14)
 )
 number.pack(pady=10)
+
+# 통화음 횟수 설명
+ring_label = tk.Label(
+    window,
+    text="통화음 횟수 설정",
+    font=("맑은 고딕", 12)
+)
+ring_label.pack(pady=(20, 5))
+
+# 통화음 횟수 선택
+ring_setting = tk.Spinbox(
+    window,
+    from_=1,
+    to=10,
+    width=5,
+    font=("맑은 고딕", 14),
+    justify="center"
+)
+ring_setting.delete(0, "end")
+ring_setting.insert(0, "3")
+ring_setting.pack()
 
 # 현재 상태
 status = tk.Label(
@@ -112,7 +225,8 @@ call_button = tk.Button(
     window,
     text="통화 시작",
     font=("맑은 고딕", 14),
-    width=15
+    width=15,
+    command=start_call
 )
 call_button.pack(pady=10)
 
@@ -123,11 +237,21 @@ window.mainloop()
 ## 현재 진행상태
 
 ```
-1주차 완료: 프로젝트 주제 및 방향성 확정 (기술적/법적 한계로 인해 가상 시뮬레이터 방식으로 개발 방향 결정)
-2주차 완료 : Python과 Tkinter를 이용한 통화 시뮬레이터 기본 화면 구현
 
-진행 중 : 통화 시작 기능 및 통화음 재생 기능 구현
+1주차 완료: 프로젝트 주제 및 방향성 확정
+(기술적/법적 한계로 인해 가상 시뮬레이터 방식으로 개발 방향 결정)
 
+2주차 완료: Python과 Tkinter를 이용한 통화 시뮬레이터 기본 화면 구현
+
+3주차 진행:
+통화 시작 및 종료 기능 구현
+통화음 WAV 파일 재생 기능 구현
+통화음 반복 재생 기능 구현
+통화음 횟수 표시 기능 구현
+통화음 횟수 설정 기능 구현
+설정한 횟수 이후 음성사서함 연결 기능 구현
+
+진행 예정: 일반적인 미응답 상황과 차단 상황을 나누어 시뮬레이션하고 두 상황을 비교할 수 있도록 기능을 추가할 예정
 
 ```
 
@@ -145,3 +269,10 @@ window.mainloop()
 - 새롭게 알게 된 것: Tkinter를 이용해 프로그램 창, 글자, 버튼 등의 GUI를 만들 수 있다는 것을 배움.
 - 어려웠던 점: GUI 코드의 구조와 각 기능의 역할을 이해하는 것이 어려웠음.
 - 다음 주에 할 일: 통화 시작 버튼에 기능을 연결하고 통화음 재생 기능을 구현할 예정.
+
+### 3주차
+- 이번 주에 한 일: 통화 시작 및 종료 기능, 통화음 재생 및 반복 기능, 통화음 횟수 설정 기능, 음성사서함 연결 기능을 구현함.
+- 새롭게 알게 된 것: winsound를 이용하면 WAV 파일을 재생할 수 있고, SND_ASYNC를 사용하면 프로그램이 멈추지 않고 통화음을 재생할 수 있다는 것을 알게 됨. 또한 Tkinter의 after() 함수를 이용해 일정 시간이 지난 뒤 함수를 다시 실행할 수 있다는 것을 배움.
+- 어려웠던 점: 처음에는 통화음을 재생할 때 프로그램이 잠시 멈추는 문제가 있었고, 통화 종료 시 예약되어 있던 반복 작업까지 중단하는 부분이 어려웠음.
+- 현재 진행상태: 통화 시작 및 종료, 통화음 반복, 통화음 횟수 표시 및 설정, 설정된 횟수 이후 음성사서함 연결 기능까지 구현함.
+- 다음 주에 할 일: 일반 미응답 상황과 차단 상황을 선택할 수 있도록 만들고 두 상황을 비교할 수 있는 기능을 구현할 예정.
