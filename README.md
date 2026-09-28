@@ -72,6 +72,52 @@
 - 현재 통화 상태 표시
 - 통화 시작 버튼 표시
 
+## 2주차 구현코드
+```
+
+import tkinter as tk
+
+# 프로그램 창 만들기
+window = tk.Tk()
+window.title("통화 상황 시뮬레이터")
+window.geometry("400x500")
+
+# 제목
+title = tk.Label(
+    window,
+    text="통화 상황 시뮬레이터",
+    font=("맑은 고딕", 20, "bold")
+)
+title.pack(pady=40)
+
+# 상대방 번호
+number = tk.Label(
+    window,
+    text="010-XXXX-XXXX",
+    font=("맑은 고딕", 14)
+)
+number.pack(pady=10)
+
+# 현재 상태
+status = tk.Label(
+    window,
+    text="통화 대기",
+    font=("맑은 고딕", 16)
+)
+status.pack(pady=40)
+
+# 통화 시작 버튼
+call_button = tk.Button(
+    window,
+    text="통화 시작",
+    font=("맑은 고딕", 14),
+    width=15
+)
+call_button.pack(pady=10)
+
+# 프로그램 실행
+window.mainloop()
+```
 
 ## 현재 진행상태
 
