@@ -56,7 +56,8 @@
 
 > 여기에 현재 프로그램 실행 화면 사진을 추가할 예정입니다.
 
-![기본 화면](이미지 경로)
+<img width="150" height="199" alt="image" src="https://github.com/user-attachments/assets/151a1acf-9994-4eee-a804-bf3536e0808d" />
+
 
 ---
 
